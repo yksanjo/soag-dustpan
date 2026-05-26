@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SOAG DUSTPAN · sweep your shitcoins, claim $SOAG</title>
+  <meta name="description" content="Vacuum every dead pump.fun token out of your wallet. Reclaim SOL rent → Jupiter → $SOAG back. 1% to treasury. For DEgens with dirty wallets." />
+  <meta name="theme-color" content="#000000" />
+  <meta property="og:title" content="SOAG DUSTPAN — sweep your shitcoins, claim $SOAG" />
+  <meta property="og:description" content="Connect → vacuum → claim $SOAG. 1% to treasury. For DEgens with dirty wallets." />
+  <meta property="og:url" content="https://agentsoag.com/dustpan/" />
+  <link rel="canonical" href="https://agentsoag.com/dustpan/" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000'/%3E%3Ctext x='50' y='72' font-size='62' text-anchor='middle'%3E%F0%9F%A7%B9%3C/text%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:        #000;
+      --green-50:  #d1fae5;
+      --green-200: #bbf7d0;
+      --green-300: #86efac;
+      --green-400: #4ade80;   /* phosphor */
+      --green-500: #22c55e;
+      --green-700: #15803d;
+      --green-900: #052e16;
+
+      --line-1:    rgba(74, 222, 128, 0.10);
+      --line-2:    rgba(74, 222, 128, 0.20);
+      --line-3:    rgba(74, 222, 128, 0.40);
+      --line-4:    rgba(74, 222, 128, 0.60);
+
+      --text:      var(--green-200);
+      --text-dim:  rgba(187, 247, 208, 0.62);
+      --text-mute: rgba(187, 247, 208, 0.40);
+      --text-faint:rgba(187, 247, 208, 0.22);
+      --accent:    var(--green-400);
+      --bad:       #f87171;
+      --warn:      #facc15;
+
+      --font-pixel: 'Press Start 2P', system-ui, monospace;
+      --font-mono:  'VT323', 'Press Start 2P', ui-monospace, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+      /* faint scanlines so the phosphor feels CRT */
+      background-image:
+        repeating-linear-gradient(0deg, rgba(74,222,128,0.03) 0 1px, transparent 1px 3px);
+    }
+    a { color: var(--green-400); text-decoration: none; }
+    a:hover { color: var(--green-200); }
+    button { font-family: inherit; cursor: pointer; }
+    ::selection { background: var(--green-400); color: #000; }
+
+    .mono { font-family: var(--font-mono); font-size: 16px; letter-spacing: 0.02em; line-height: 1.4; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+    @media (max-width: 720px) { .wrap { padding: 0 14px; } }
+
+    /* ── nav ─────────────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 64px;
+      background: rgba(0,0,0,0.95);
+      border-bottom: 1px solid var(--line-1);
+      backdrop-filter: blur(10px);
+      z-index: 50;
+      display: flex; align-items: center;
+      padding: 0 20px;
+    }
+    .nav-inner { width: 100%; max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--green-400);
+      letter-spacing: 0.18em;
+    }
+    .brand .mark {
+      width: 28px; height: 28px;
+      display: grid; place-items: center;
+      background: rgba(74,222,128,0.15);
+      border: 1px solid var(--line-2);
+      color: var(--green-400);
+      font-size: 14px;
+    }
+    .nav-tools { display: flex; gap: 6px; margin-left: 12px; }
+    .nav-tool {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      border: 1px solid var(--line-2);
+      color: rgba(74, 222, 128, 0.7);
+      font-size: 14px;
+      transition: all 0.12s;
+      position: relative;
+    }
+    .nav-tool.active { background: rgba(74,222,128,0.15); color: var(--green-200); }
+    .nav-tool:hover { background: rgba(74,222,128,0.10); color: var(--green-200); }
+    .nav-tool .tip {
+      position: absolute; left: 0; top: 100%; margin-top: 6px;
+      white-space: nowrap;
+      padding: 6px 10px;
+      background: #000; border: 1px solid var(--line-3); color: var(--green-300);
+      font-size: 9px; opacity: 0; transition: opacity 0.12s; pointer-events: none;
+      z-index: 60;
+    }
+    .nav-tool:hover .tip { opacity: 1; }
+    .nav-spacer { flex: 1; }
+    .nav-status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 9px; color: var(--green-400);
+      letter-spacing: 0.18em;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      background: var(--green-400);
+      box-shadow: 0 0 8px var(--green-400);
+      animation: dot-pulse 1.6s infinite;
+    }
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .nav-pad { height: 64px; }
+
+    /* ── hero ─────────────────────────────────────────────────── */
+    .hero { padding: 56px 0 32px; text-align: center; }
+    .hero h1 {
+      font-family: var(--font-pixel);
+      font-weight: normal;
+      font-size: clamp(20px, 3.6vw, 32px);
+      letter-spacing: 0.06em;
+      line-height: 1.4;
+      margin: 0 0 18px;
+      color: var(--green-400);
+      text-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+    }
+    .hero .sub {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      color: var(--green-200);
+      max-width: 60ch;
+      margin: 0 auto;
+      line-height: 1.55;
+      letter-spacing: 0.01em;
+    }
+    .hero .sub b { color: var(--green-400); font-weight: normal; }
+
+    /* ── section title (terminal-style) ───────────────────────── */
+    section { padding: 36px 0; border-top: 1px solid var(--line-1); }
+    section:first-of-type { border-top: 0; }
+    .sec-title {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--green-400);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      margin: 0 0 20px;
+      text-transform: uppercase;
+    }
+    .sec-title::before {
+      content: '>'; color: var(--green-400);
+    }
+
+    /* ── button ───────────────────────────────────────────────── */
+    .btn {
+      appearance: none;
+      background: rgba(74,222,128,0.15);
+      border: 1px solid var(--line-3);
+      color: var(--green-200);
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      padding: 12px 18px;
+      transition: all 0.12s;
+      text-transform: uppercase;
+    }
+    .btn:hover:not(:disabled) { background: rgba(74,222,128,0.25); color: var(--green-400); border-color: var(--line-4); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn.primary { background: var(--green-400); color: #000; border-color: var(--green-400); }
+    .btn.primary:hover:not(:disabled) { background: var(--green-300); border-color: var(--green-300); }
+    .btn.huge { font-size: 13px; padding: 18px 28px; letter-spacing: 0.16em; }
+    .btn.ghost { background: transparent; }
+
+    /* ── connect card ─────────────────────────────────────────── */
+    .connect-card {
+      border: 1px solid var(--line-2);
+      padding: 28px;
+      background: rgba(74,222,128,0.02);
+      text-align: center;
+    }
+    .connect-card .ic {
+      font-size: 32px;
+      color: var(--green-400);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .connect-card h3 {
+      font-family: var(--font-pixel);
+      font-weight: normal;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: var(--green-400);
+      margin: 0 0 8px;
+    }
+    .connect-card .sub {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text-dim);
+      margin: 0 0 22px;
+      line-height: 1.5;
+    }
+    .wallets {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      justify-content: center;
+    }
+    .wallet-btn {
+      appearance: none;
+      background: transparent;
+      border: 1px solid var(--line-2);
+      color: var(--green-200);
+      padding: 12px 18px;
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      display: inline-flex; align-items: center; gap: 10px;
+      transition: all 0.12s;
+      text-transform: uppercase;
+    }
+    .wallet-btn:hover { background: rgba(74,222,128,0.10); color: var(--green-400); border-color: var(--line-3); }
+    .wallet-icon { width: 14px; height: 14px; display: inline-block; }
+
+    /* inline wallet error (replaces native confirm popup) */
+    .wallet-err {
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid var(--warn);
+      background: rgba(250, 204, 21, 0.05);
+      text-align: center;
+    }
+    .wallet-err .err-line {
+      font-family: var(--font-pixel); font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--warn);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .wallet-err .err-sub {
+      font-family: var(--font-mono); font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .wallet-err .err-sub b { color: var(--green-300); font-weight: normal; }
+    .wallet-err .btn { margin-top: 4px; }
+
+    /* ── connected: wallet bar ─────────────────────────────────── */
+    .wallet-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px;
+      border: 1px solid var(--line-2);
+      margin-bottom: 24px;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .wallet-bar .lbl { color: var(--green-400); font-family: var(--font-pixel); font-size: 9px; letter-spacing: 0.18em; margin-right: 10px; }
+
+    /* ── stat grid ────────────────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--line-2);
+      margin-bottom: 24px;
+    }
+    @media (max-width: 720px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat {
+      padding: 18px 16px;
+      border-right: 1px solid var(--line-1);
+      border-bottom: 1px solid var(--line-1);
+    }
+    .stat:nth-child(4n) { border-right: 0; }
+    .stat:nth-last-child(-n+4) { border-bottom: 0; }
+    @media (max-width: 720px) {
+      .stat:nth-child(2n) { border-right: 0; }
+      .stat:nth-last-child(-n+4) { border-bottom: 1px solid var(--line-1); }
+      .stat:nth-last-child(-n+2) { border-bottom: 0; }
+    }
+    .stat-k {
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      color: var(--green-400);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .stat-v {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      color: var(--green-200);
+      line-height: 1;
+    }
+    .stat-v.accent { color: var(--green-400); }
+    .stat-v.warn { color: var(--warn); }
+    .stat-sub {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-mute);
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
+    /* ── dust table ───────────────────────────────────────────── */
+    .dust-table {
+      border: 1px solid var(--line-2);
+      background: #000;
+    }
+    .dust-table .row {
+      display: grid;
+      grid-template-columns: 40px 1.4fr 1fr 1fr 110px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line-1);
+      font-family: var(--font-mono);
+      font-size: 15px;
+    }
+    .dust-table .row:first-child { border-top: 0; }
+    .dust-table .row.header {
+      background: rgba(74,222,128,0.05);
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      color: var(--green-400);
+      padding: 10px 16px;
+      text-transform: uppercase;
+    }
+    .dust-table .row.empty-state {
+      padding: 56px 16px;
+      grid-template-columns: 1fr;
+      text-align: center;
+      color: var(--text-mute);
+      font-family: var(--font-mono);
+      font-size: 16px;
+    }
+    @media (max-width: 720px) {
+      .dust-table .row { grid-template-columns: 32px 1.6fr auto 90px; font-size: 13px; padding: 10px 12px; }
+      .dust-table .row .hide-mobile { display: none; }
+    }
+    .token-icon {
+      width: 28px; height: 28px;
+      border: 1px solid var(--line-2);
+      display: grid; place-items: center;
+      font-size: 14px;
+      color: var(--green-400);
+    }
+    .token-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .token-name .sym { color: var(--green-200); font-family: var(--font-pixel); font-size: 9px; letter-spacing: 0.10em; }
+    .token-name .mint { color: var(--text-faint); font-family: var(--font-mono); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .balance .raw { color: var(--green-200); }
+    .balance .usd { color: var(--text-mute); font-size: 13px; }
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      border: 1px solid var(--line-2);
+      color: var(--text-dim);
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge.close { background: rgba(74,222,128,0.15); border-color: var(--line-3); color: var(--green-400); }
+    .badge.swap { background: transparent; border-color: var(--line-2); color: var(--green-300); }
+    .badge.skip { background: transparent; border-color: var(--line-1); color: var(--text-faint); }
+
+    /* ── sweep cta ────────────────────────────────────────────── */
+    .sweep-card {
+      margin-top: 24px;
+      border: 1px solid var(--green-400);
+      padding: 24px;
+      background: rgba(74,222,128,0.05);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: center;
+    }
+    @media (max-width: 720px) { .sweep-card { grid-template-columns: 1fr; padding: 18px; } }
+    .sweep-card h3 {
+      font-family: var(--font-pixel); font-weight: normal;
+      font-size: 13px; letter-spacing: 0.16em;
+      color: var(--green-400);
+      margin: 0 0 8px;
+      text-transform: uppercase;
+    }
+    .sweep-card .sub {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .sweep-card .sub b { color: var(--green-200); font-weight: normal; }
+    .sweep-card .out { color: var(--green-400); font-weight: normal; }
+
+    /* ── console ──────────────────────────────────────────────── */
+    .console {
+      margin-top: 24px;
+      background: #000;
+      border: 1px solid var(--line-2);
+      padding: 16px 18px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-dim);
+      max-height: 260px;
+      overflow-y: auto;
+      line-height: 1.55;
+    }
+    .console .line { display: block; }
+    .console .line::before { content: '$ '; color: var(--green-400); }
+    .console .ok { color: var(--green-400); }
+    .console .warn { color: var(--warn); }
+    .console .bad { color: var(--bad); }
+    .console .dim { color: var(--text-faint); }
+
+    /* ── success card ─────────────────────────────────────────── */
+    .success-card {
+      margin-top: 24px;
+      border: 1px solid var(--green-400);
+      padding: 32px;
+      background: rgba(74,222,128,0.08);
+      text-align: center;
+    }
+    .success-card .stamp {
+      font-family: var(--font-pixel); font-size: 16px;
+      letter-spacing: 0.20em;
+      color: var(--green-400);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .success-card .big {
+      font-family: var(--font-mono);
+      font-size: clamp(40px, 7vw, 64px);
+      line-height: 1;
+      margin: 12px 0;
+      color: var(--green-400);
+      text-shadow: 0 0 14px rgba(74,222,128,0.4);
+    }
+    .success-card .meta {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+    .success-card .tx-links { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+    .success-card .tx-links a {
+      font-family: var(--font-pixel); font-size: 8px;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      border: 1px solid var(--line-2);
+      padding: 8px 12px;
+    }
+    .success-card .tx-links a:hover { color: var(--green-400); border-color: var(--line-3); }
+    .success-card .actions { margin-top: 22px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FAQ ───────────────────────────────────────────────────── */
+    .faq { border: 1px solid var(--line-2); }
+    .faq .q {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 0; border-top: 1px solid var(--line-1);
+      padding: 14px 16px;
+      color: var(--green-200);
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.12s;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+    .faq .q:first-of-type { border-top: 0; }
+    .faq .q:hover { background: rgba(74,222,128,0.05); }
+    .faq .q .plus { color: var(--green-400); font-size: 14px; margin-left: 12px; transition: transform 0.15s; }
+    .faq .q.open .plus { transform: rotate(45deg); }
+    .faq .a {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.25s ease, padding 0.25s ease;
+      padding: 0 16px;
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+    .faq .a.open { max-height: 400px; padding: 0 16px 16px; }
+    .faq .a b { color: var(--green-200); font-weight: normal; }
+
+    /* ── footer ───────────────────────────────────────────────── */
+    footer {
+      padding: 36px 0 56px;
+      border-top: 1px solid var(--line-1);
+      color: var(--text-mute);
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+    .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 30px; }
+    @media (max-width: 720px) { .foot-grid { grid-template-columns: 1fr; gap: 16px; } }
+    footer .h {
+      font-family: var(--font-pixel); font-size: 9px;
+      letter-spacing: 0.18em; color: var(--green-400);
+      margin-bottom: 10px; text-transform: uppercase;
+    }
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--green-400); }
+
+    /* ── pixel vacuum mascot ─────────────────────────────────── */
+    .vacuum-track {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      height: 80px;
+      pointer-events: none;
+      z-index: 40;
+      overflow: hidden;
+    }
+    .vacuum {
+      position: absolute;
+      bottom: 12px;
+      left: -120px;
+      width: 80px; height: 80px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      shape-rendering: crispEdges;
+      animation: walk-cross 14s linear infinite, bob 0.4s steps(2) infinite;
+    }
+    @keyframes walk-cross {
+      0%   { left: -120px; transform: scaleX(1); }
+      48%  { left: calc(100vw + 0px); transform: scaleX(1); }
+      50%  { left: calc(100vw + 0px); transform: scaleX(-1); }
+      98%  { left: -120px; transform: scaleX(-1); }
+      100% { left: -120px; transform: scaleX(1); }
+    }
+    @keyframes bob {
+      0%   { margin-bottom: 0; }
+      50%  { margin-bottom: 2px; }
+      100% { margin-bottom: 0; }
+    }
+    /* trailing dust suction */
+    .vacuum-dust {
+      position: absolute;
+      bottom: 14px; left: -120px;
+      width: 30px; height: 4px;
+      animation: walk-cross 14s linear infinite;
+      display: flex; gap: 4px; align-items: center;
+    }
+    .vacuum-dust .pp {
+      width: 4px; height: 4px;
+      background: var(--green-400);
+      box-shadow: 0 0 4px var(--green-400);
+      opacity: 0.5;
+      animation: dust-fade 0.4s linear infinite;
+    }
+    .vacuum-dust .pp:nth-child(2) { animation-delay: 0.1s; opacity: 0.4; }
+    .vacuum-dust .pp:nth-child(3) { animation-delay: 0.2s; opacity: 0.3; }
+    .vacuum-dust .pp:nth-child(4) { animation-delay: 0.3s; opacity: 0.2; }
+    @keyframes dust-fade {
+      0% { opacity: 0.6; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-6px); }
+    }
+
+    /* ── pre-sign modal (sets context before wallet popups) ──── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.on { display: flex; }
+    .modal {
+      background: var(--bg);
+      border: 1px solid var(--green-400);
+      max-width: 540px; width: 100%;
+      padding: 28px;
+      box-shadow: 0 0 32px rgba(74,222,128,0.25);
+    }
+    .modal h3 {
+      font-family: var(--font-pixel); font-weight: normal;
+      font-size: 13px; letter-spacing: 0.18em;
+      color: var(--green-400); margin: 0 0 16px;
+      text-transform: uppercase;
+    }
+    .modal-list {
+      margin: 18px 0;
+      padding: 0;
+      list-style: none;
+      font-family: var(--font-mono); font-size: 15px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .modal-list li {
+      padding: 10px 12px;
+      border: 1px solid var(--line-2);
+      margin-bottom: 6px;
+      display: grid; grid-template-columns: 22px 1fr; gap: 10px;
+      align-items: start;
+    }
+    .modal-list .ix {
+      font-family: var(--font-pixel); font-size: 9px;
+      color: var(--green-400); letter-spacing: 0.14em;
+      padding-top: 4px;
+    }
+    .modal-list b { color: var(--green-300); font-weight: normal; }
+    .modal-note {
+      font-family: var(--font-mono); font-size: 14px;
+      color: var(--warn);
+      border-left: 2px solid var(--warn);
+      padding: 8px 12px;
+      margin: 18px 0;
+      background: rgba(250, 204, 21, 0.05);
+      line-height: 1.5;
+    }
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    /* ── flash overlay for sweep ──────────────────────────────── */
+    .swept-flash {
+      position: fixed; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(74,222,128,0.30), transparent 60%);
+      pointer-events: none; z-index: 999;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .swept-flash.on { opacity: 1; }
+
+    /* ── dust particle FX (sweep success) ─────────────────────── */
+    .dust-fx { position: fixed; inset: 0; pointer-events: none; z-index: 998; overflow: hidden; }
+    .dust-fx .p {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--green-400);
+      box-shadow: 0 0 8px var(--green-400);
+      animation: vacuum-fly 1.2s ease-in forwards;
+    }
+    @keyframes vacuum-fly {
+      0%   { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1); opacity: 1; }
+      100% { transform: translate(0, 0) scale(0.1); opacity: 0; }
+    }
+
+    /* ── utilities ────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .text-mute { color: var(--text-mute); }
+    .row-flex { display: flex; align-items: center; gap: 12px; }
+
+    /* ── spinner ──────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      vertical-align: -2px;
+      width: 10px; height: 10px;
+      margin-right: 6px;
+      background: var(--green-400);
+      animation: spinner-blink 0.4s steps(2) infinite;
+    }
+    @keyframes spinner-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* keep content above the vacuum track on small screens */
+    main { padding-bottom: 100px; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── pixel vacuum mascot (walks the bottom edge) ─── -->
+  <div class="vacuum-track" aria-hidden="true">
+    <svg class="vacuum" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+      <!-- handle pole -->
+      <rect x="6" y="0"  width="2" height="1" fill="#4ade80"/>
+      <rect x="5" y="1"  width="4" height="1" fill="#4ade80"/>
+      <rect x="6" y="2"  width="2" height="5" fill="#4ade80"/>
+      <!-- body -->
+      <rect x="4" y="7"  width="6" height="1" fill="#4ade80"/>
+      <rect x="3" y="8"  width="8" height="1" fill="#4ade80"/>
+      <rect x="3" y="9"  width="8" height="1" fill="#22c55e"/>
+      <!-- power LED -->
+      <rect x="5" y="9"  width="1" height="1" fill="#d1fae5"/>
+      <rect x="3" y="10" width="8" height="1" fill="#4ade80"/>
+      <rect x="3" y="11" width="8" height="1" fill="#22c55e"/>
+      <rect x="4" y="12" width="6" height="1" fill="#4ade80"/>
+      <!-- base/nozzle extending right -->
+      <rect x="2" y="13" width="11" height="2" fill="#4ade80"/>
+      <!-- wheels -->
+      <rect x="3" y="15" width="1" height="1" fill="#15803d"/>
+      <rect x="11" y="15" width="1" height="1" fill="#15803d"/>
+    </svg>
+  </div>
+
+  <!-- ─── nav (incinerator-style icon strip) ─── -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="/">
+        <span class="mark">$</span>
+        <span>AGENTSOAG</span>
+      </a>
+      <div class="nav-tools">
+        <a class="nav-tool active" href="/dustpan/">🧹<span class="tip">DUSTPAN · SWEEP TO $SOAG</span></a>
+        <a class="nav-tool" href="/swap/">💱<span class="tip">BUY $SOAG</span></a>
+        <a class="nav-tool" href="/wheel/">🎡<span class="tip">DAILY WHEEL</span></a>
+        <a class="nav-tool" href="/signals/">📡<span class="tip">SIGNALS</span></a>
+      </div>
+      <div class="nav-spacer"></div>
+      <div class="nav-status">
+        <span class="dot"></span>
+        <span>MAINNET</span>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-pad"></div>
+
+  <main class="wrap">
+
+    <!-- hero -->
+    <section class="hero">
+      <h1>SOAG DUSTPAN</h1>
+      <p class="sub">
+        vacuum every dead pump.fun bag out of your wallet.<br/>
+        <b>each empty token account = 0.002 SOL of YOUR sol</b> locked in rent.<br/>
+        sweep them, claim <b>$SOAG</b> back. one signature.
+      </p>
+    </section>
+
+    <!-- connect -->
+    <section id="connect-sec">
+      <h2 class="sec-title">01 CONNECT WALLET</h2>
+      <div id="connect-card" class="connect-card">
+        <span class="ic">🧹</span>
+        <h3>WALLET NOT CONNECTED</h3>
+        <p class="sub">we read your SPL token accounts via helius. nothing is signed until you press the sweep button on the next step.</p>
+        <div class="wallets">
+          <button class="wallet-btn" data-wallet="phantom">
+            <svg class="wallet-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#ab9ff2"/><rect x="4" y="4" width="2" height="2" fill="#000"/><rect x="10" y="4" width="2" height="2" fill="#000"/></svg>
+            PHANTOM
+          </button>
+          <button class="wallet-btn" data-wallet="solflare">
+            <svg class="wallet-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#fc8e2c"/><rect x="6" y="2" width="4" height="12" fill="#fff"/></svg>
+            SOLFLARE
+          </button>
+          <button class="wallet-btn" data-wallet="backpack">
+            <svg class="wallet-icon" viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" fill="#e33e3f"/><rect x="3" y="6" width="10" height="6" fill="#fff"/></svg>
+            BACKPACK
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- scan -->
+    <section id="scan-sec" class="hidden">
+      <h2 class="sec-title">02 SCAN RESULTS · <span id="scan-status" style="color:var(--text-mute);letter-spacing:0.12em;">AWAITING SCAN</span></h2>
+
+      <div class="wallet-bar">
+        <div><span class="lbl">WALLET</span><span id="wallet-addr">—</span></div>
+        <div class="row-flex">
+          <button class="btn ghost" id="rescan-btn">↻ RESCAN</button>
+          <button class="btn ghost" id="disconnect-btn">DISCONNECT</button>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-k">DUST POSITIONS</div>
+          <div class="stat-v" id="stat-count">—</div>
+          <div class="stat-sub" id="stat-count-sub">total spl accounts</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">CLOSEABLE</div>
+          <div class="stat-v accent" id="stat-closeable">—</div>
+          <div class="stat-sub" id="stat-closeable-sub">empty &amp; reclaim-eligible</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">RECLAIM SOL</div>
+          <div class="stat-v accent" id="stat-sol">—</div>
+          <div class="stat-sub" id="stat-sol-sub">@ 0.00203928 per ATA</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">EST. $SOAG OUT</div>
+          <div class="stat-v" id="stat-soag">—</div>
+          <div class="stat-sub" id="stat-soag-sub">net of 1% treasury fee</div>
+        </div>
+      </div>
+
+      <div class="dust-table" id="dust-table">
+        <div class="row header">
+          <div></div>
+          <div>TOKEN</div>
+          <div class="hide-mobile">BALANCE</div>
+          <div class="hide-mobile">VALUE (SOL)</div>
+          <div>ACTION</div>
+        </div>
+        <div class="row empty-state" id="dust-empty">
+          <div><span class="spinner"></span>SCANNING YOUR WALLET…</div>
+        </div>
+      </div>
+
+      <div class="sweep-card hidden" id="sweep-card">
+        <div>
+          <h3>READY TO VACUUM</h3>
+          <p class="sub">
+            close <b id="cta-count">0</b> empty accounts · reclaim <b id="cta-sol">0</b> SOL ·
+            1% (<b id="cta-fee">0</b> SOL) to treasury · swap <b id="cta-swap">0</b> SOL →
+            <span class="out" id="cta-out">~0 $SOAG</span>
+          </p>
+        </div>
+        <button class="btn primary huge" id="sweep-btn">🧹 SWEEP + CLAIM</button>
+      </div>
+
+      <div class="console hidden" id="console">
+        <span class="line dim">dustpan.sh --execute</span>
+      </div>
+
+      <div class="success-card hidden" id="success">
+        <div class="stamp">[ ▣ SWEPT ▣ ]</div>
+        <div class="big"><span id="success-amount">0</span> $SOAG</div>
+        <div class="meta">deposited to <span id="success-addr"></span></div>
+        <div class="tx-links" id="success-links"></div>
+        <div class="actions">
+          <a id="share-x" class="btn" href="#" target="_blank" rel="noopener">SHARE ON X</a>
+          <button class="btn ghost" id="sweep-again">SWEEP AGAIN</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- how it works -->
+    <section>
+      <h2 class="sec-title">03 HOW THE VACUUM WORKS</h2>
+      <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="stat">
+          <div class="stat-k">STEP 01</div>
+          <div style="font-family:var(--font-pixel);font-size:11px;letter-spacing:0.10em;color:var(--green-200);margin:6px 0 8px;line-height:1.5;">ENUMERATE</div>
+          <div class="stat-sub">helius pulls every SPL position you've ever opened.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">STEP 02</div>
+          <div style="font-family:var(--font-pixel);font-size:11px;letter-spacing:0.10em;color:var(--green-200);margin:6px 0 8px;line-height:1.5;">CLASSIFY</div>
+          <div class="stat-sub">amount = 0 → close-eligible. amount &gt; 0 → flagged phase 2.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">STEP 03</div>
+          <div style="font-family:var(--font-pixel);font-size:11px;letter-spacing:0.10em;color:var(--green-200);margin:6px 0 8px;line-height:1.5;">BUNDLE</div>
+          <div class="stat-sub">one tx: close N ATAs + 1% to treasury. one tx: jupiter SOL → $SOAG.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-k">STEP 04</div>
+          <div style="font-family:var(--font-pixel);font-size:11px;letter-spacing:0.10em;color:var(--green-200);margin:6px 0 8px;line-height:1.5;">CLAIM</div>
+          <div class="stat-sub">$SOAG lands in your wallet. flex on the cope.</div>
+        </div>
+      </div>
+      <p style="font-family:var(--font-mono);font-size:14px;color:var(--text-mute);margin-top:14px;">
+        on-chain, no custody. open source: <a href="https://github.com/yksanjo/soag-dustpan" target="_blank" rel="noopener">github.com/yksanjo/soag-dustpan</a> ·
+        treasury <a href="https://solscan.io/account/J7Vq2JjQoH72n1kzy1yjm4dCG65gw1oSVzMECwRyd7fP" target="_blank" rel="noopener">J7Vq2…d7fP</a> ·
+        $SOAG mint <a href="https://solscan.io/token/ADue87cPcDhsyGq2hrDsukp7j8AFTSnaYHSanDATpump" target="_blank" rel="noopener">ADue8…pump</a>
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section>
+      <h2 class="sec-title">04 FAQ</h2>
+      <div class="faq" id="faq">
+        <button class="q"><span>WHAT IS SOAG DUSTPAN?</span><span class="plus">+</span></button>
+        <div class="a">A vacuum for your Solana wallet. It closes every empty SPL token account, reclaims the SOL rent locked inside, and swaps the recovered SOL into <b>$SOAG</b> via Jupiter — all in one connect-and-sign flow. 1% of reclaimed SOL goes to the $SOAG treasury, 99% becomes $SOAG in your wallet.</div>
+
+        <button class="q"><span>WHERE DOES THE RECLAIMED SOL COME FROM?</span><span class="plus">+</span></button>
+        <div class="a">On Solana, every SPL token account requires <b>~0.00203928 SOL</b> as a rent deposit. When a token balance drops to zero, that deposit stays locked unless you explicitly close the account. Dustpan closes them in bulk and returns the rent to you.</div>
+
+        <button class="q"><span>IS IT SAFE?</span><span class="plus">+</span></button>
+        <div class="a">Yes. Dustpan is non-custodial — your wallet signs every transaction, we never hold your keys. Phantom shows you the exact balance changes before you approve. <b>1% goes to the SOAG treasury</b> (publicly viewable on Solscan) and 99% becomes $SOAG in your wallet via Jupiter. <b>Source code is public</b> — audit it yourself at <a href="https://github.com/yksanjo/soag-dustpan" target="_blank" rel="noopener">github.com/yksanjo/soag-dustpan</a>.</div>
+
+        <button class="q"><span>HOW IS THIS DIFFERENT FROM INCINERATOR.FUN / SOL-INCINERATOR?</span><span class="plus">+</span></button>
+        <div class="a">Same close-ATA mechanic, different destination. Incinerators give you back SOL. Dustpan converts that SOL into <b>$SOAG</b> in the same signed flow — one click, no follow-up swap. Built for the $SOAG ecosystem flywheel: every sweep is buy-pressure on the token.</div>
+
+        <button class="q"><span>WHAT WALLETS DOES IT SUPPORT?</span><span class="plus">+</span></button>
+        <div class="a">Phantom, Solflare, and Backpack. Anything with a standard Solana wallet provider should work.</div>
+
+        <button class="q"><span>CAN I SWAP DEAD-BUT-NON-ZERO DUST? (PHASE 2)</span><span class="plus">+</span></button>
+        <div class="a">Not yet. v1 closes empty accounts only — the guaranteed-yield path. Phase 2 will route Jupiter swaps for non-empty dust (sub-$1 bags) in the same bundled flow. If you have specific tokens you want to liquidate, do it in Jupiter UI for now and re-run Dustpan to close the resulting empty ATA.</div>
+
+        <button class="q"><span>HOW DO I VERIFY THE SWEEP?</span><span class="plus">+</span></button>
+        <div class="a">After execution the success screen links every transaction to Solscan. You'll see the close instructions, the 1% treasury transfer, and the Jupiter swap that delivered your $SOAG.</div>
+
+        <button class="q"><span>WHAT'S THE MAX I CAN SWEEP PER SIGN?</span><span class="plus">+</span></button>
+        <div class="a">88 closeable accounts per sweep (4 chunks × 22 ixs each), so wallets don't choke on too many simultaneous tx signatures. If you have more dust than that, run Dustpan twice — the second sweep picks up what the first left behind.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="wrap foot-grid">
+      <div>
+        <div class="h">SOAG DUSTPAN</div>
+        <div>vacuum for solana wallets. for the DEgens with 60+ open positions in tokens that are already PoW (proof of worthless).</div>
+      </div>
+      <div>
+        <div class="h">PRODUCTS</div>
+        <div><a href="/swap/">BUY $SOAG</a></div>
+        <div><a href="/wheel/">DAILY WHEEL</a></div>
+        <div><a href="/signals/">SIGNALS</a></div>
+        <div><a href="/flow/">FLOW</a></div>
+      </div>
+      <div>
+        <div class="h">STACK</div>
+        <div>HELIUS RPC</div>
+        <div>JUPITER v1</div>
+        <div>SPL TOKEN</div>
+        <div><a href="https://t.me/+ywGUPczH4GllYTBh" target="_blank" rel="noopener">$SOAG TG</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- pre-sign confirmation modal -->
+  <div class="modal-overlay" id="presign-modal">
+    <div class="modal">
+      <h3>▣ ABOUT TO SIGN <span id="presign-count">0</span> TRANSACTIONS</h3>
+      <div style="font-family:var(--font-mono);font-size:15px;color:var(--text-dim);line-height:1.55;">
+        you'll approve all signatures in one wallet popup. here's exactly what each does:
+      </div>
+      <ol class="modal-list" id="presign-list">
+        <!-- populated by JS -->
+      </ol>
+      <div class="modal-note">
+        ⚠ your wallet (Phantom/Solflare) will show warnings about multiple transactions and an unverified token — this is expected for a new dApp. nothing leaves your wallet that you don't approve.
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="presign-cancel">CANCEL</button>
+        <button class="btn primary" id="presign-go">CONTINUE → WALLET</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dust-fx" id="dust-fx"></div>
+  <div class="swept-flash" id="swept-flash"></div>
+
+  <!-- FAQ accordion -->
+  <script>
+    document.querySelectorAll('#faq .q').forEach(q => {
+      q.addEventListener('click', () => {
+        const a = q.nextElementSibling;
+        const open = q.classList.toggle('open');
+        a.classList.toggle('open', open);
+      });
+    });
+  </script>
+
+  <script type="module">
+    import {
+      Connection, PublicKey, VersionedTransaction, TransactionMessage,
+      TransactionInstruction, SystemProgram, LAMPORTS_PER_SOL
+    } from 'https://esm.sh/@solana/web3.js@1.95.4';
+    import {
+      TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, createCloseAccountInstruction
+    } from 'https://esm.sh/@solana/spl-token@0.4.8';
+
+    // Memo program — adds a labelled note to each tx so Solscan + Phantom
+    // can show "soag-dustpan/v1 sweep" instead of "unknown program call".
+    const MEMO_PROGRAM_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
+    function memoIx(text) {
+      return new TransactionInstruction({
+        programId: MEMO_PROGRAM_ID,
+        keys: [],
+        data: new TextEncoder().encode(text),
+      });
+    }
+
+    /* ────────── config ────────── */
+    const HELIUS_KEY    = '5bb69ab9-3e25-4b80-a043-f1c482490b06';
+    const RPC_URL       = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
+    const SOAG_MINT     = new PublicKey('ADue87cPcDhsyGq2hrDsukp7j8AFTSnaYHSanDATpump');
+    const TREASURY      = new PublicKey('J7Vq2JjQoH72n1kzy1yjm4dCG65gw1oSVzMECwRyd7fP');
+    const FEE_BPS       = 100;          // 1%
+    const RENT_PER_ATA  = 2039280;      // lamports reclaimed per closed account
+    const CLOSE_CHUNK   = 15;           // smaller batches = fewer Blowfish/Phantom risk flags
+    const MAX_CLOSE_PER_SWEEP = 88;     // cap per sweep so wallets don't choke (4 chunks)
+    const JUP_QUOTE     = 'https://lite-api.jup.ag/swap/v1/quote';
+    const JUP_SWAP      = 'https://lite-api.jup.ag/swap/v1/swap';
+    const SOL_MINT      = 'So11111111111111111111111111111111111111112';
+
+    /* ────────── state ────────── */
+    const state = {
+      wallet:    null,
+      walletName:null,
+      pubkey:    null,
+      conn:      new Connection(RPC_URL, 'confirmed'),
+      accounts:  [],
+      meta:      {},
+      solPriceUsd: 0,
+    };
+
+    /* ────────── tiny dom helpers ────────── */
+    const $ = (id) => document.getElementById(id);
+    const fmtSol = (lamports) => (lamports / LAMPORTS_PER_SOL).toFixed(6).replace(/\.?0+$/, '');
+    const fmtSolShort = (lamports) => (lamports / LAMPORTS_PER_SOL).toFixed(4);
+    const fmtNum = (n) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    const shorten = (s, l = 4, r = 4) => `${s.slice(0, l)}…${s.slice(-r)}`;
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+    function log(msg, kind = '') {
+      const c = $('console');
+      c.classList.remove('hidden');
+      const line = document.createElement('span');
+      line.className = `line ${kind}`;
+      line.textContent = `${new Date().toTimeString().slice(0,8)} · ${msg}`;
+      c.appendChild(line);
+      c.scrollTop = c.scrollHeight;
+    }
+
+    /* ────────── wallet adapters ────────── */
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    function getAdapter(name) {
+      if (name === 'phantom')  return window.phantom?.solana;
+      if (name === 'solflare') return window.solflare;
+      if (name === 'backpack') return window.backpack?.solana || window.backpack;
+      return null;
+    }
+    function adapterInstallUrl(name) {
+      return {
+        phantom:  'https://phantom.app/download',
+        solflare: 'https://solflare.com/download',
+        backpack: 'https://backpack.app/download',
+      }[name];
+    }
+    // Mobile deep-links — open the dustpan inside the wallet's own in-app browser
+    // (where window.phantom etc. ARE injected). This is the fix for "wallet not
+    // found" on phones, which is the typical $SOAG community TG → tap → mobile
+    // browser flow.
+    function mobileDeepLink(name) {
+      const here = encodeURIComponent(location.href);
+      const ref  = encodeURIComponent(location.origin);
+      return {
+        phantom:  `https://phantom.app/ul/browse/${here}?ref=${ref}`,
+        solflare: `https://solflare.com/ul/v1/browse/${here}?ref=${ref}`,
+        backpack: `https://backpack.app/ul/v1/browse/${here}?ref=${ref}`,
+      }[name];
+    }
+
+    async function waitForAdapter(name, maxMs = 2500) {
+      const start = Date.now();
+      while (Date.now() - start < maxMs) {
+        const a = getAdapter(name);
+        if (a) return a;
+        await new Promise(r => setTimeout(r, 120));
+      }
+      return null;
+    }
+
+    function showWalletError(name, kind) {
+      const card = $('connect-card');
+      const existing = card.querySelector('.wallet-err');
+      if (existing) existing.remove();
+      const msg = document.createElement('div');
+      msg.className = 'wallet-err';
+      const NAME = name.toUpperCase();
+      let html;
+      if (kind === 'not-installed' && isMobile) {
+        const dl = mobileDeepLink(name);
+        html = `
+          <div class="err-line">⚠ ${NAME} NOT FOUND IN THIS BROWSER</div>
+          <div class="err-sub">on mobile, you need to open this page <b>inside ${NAME}'s in-app browser</b>.</div>
+          <a class="btn primary" href="${dl}">OPEN IN ${NAME} →</a>
+        `;
+      } else if (kind === 'not-installed') {
+        const url = adapterInstallUrl(name);
+        html = `
+          <div class="err-line">⚠ ${NAME} EXTENSION NOT DETECTED</div>
+          <div class="err-sub">install the extension, refresh, and try again. if you already have it, the page may have loaded faster than the wallet — hit refresh.</div>
+          <a class="btn" href="${url}" target="_blank" rel="noopener">INSTALL ${NAME} →</a>
+        `;
+      } else if (kind === 'rejected') {
+        html = `
+          <div class="err-line">⚠ ${NAME} CONNECTION REJECTED</div>
+          <div class="err-sub">you cancelled the connect prompt. tap the button again to retry.</div>
+        `;
+      } else {
+        html = `
+          <div class="err-line">⚠ ${NAME} CONNECT FAILED</div>
+          <div class="err-sub">unknown error. try refresh, or switch to a different wallet.</div>
+        `;
+      }
+      msg.innerHTML = html;
+      card.appendChild(msg);
+    }
+
+    function clearWalletError() {
+      const card = $('connect-card');
+      const existing = card.querySelector('.wallet-err');
+      if (existing) existing.remove();
+    }
+
+    async function connect(name) {
+      clearWalletError();
+      // Mobile + not injected → deep-link directly. Skip the "install" UI step
+      // since the user almost certainly already has the wallet on their phone.
+      if (isMobile && !getAdapter(name)) {
+        const dl = mobileDeepLink(name);
+        if (dl) { location.href = dl; return; }
+      }
+      const a = await waitForAdapter(name);
+      if (!a) {
+        showWalletError(name, 'not-installed');
+        return;
+      }
+      try {
+        const resp = await a.connect();
+        state.wallet = a;
+        state.walletName = name;
+        state.pubkey = new PublicKey(resp.publicKey ? resp.publicKey.toString() : a.publicKey.toString());
+        afterConnect();
+      } catch (e) {
+        if (/reject|cancel|user/i.test(String(e.message || e))) {
+          showWalletError(name, 'rejected');
+        } else {
+          showWalletError(name, 'unknown');
+          log(`connect error: ${e.message || e}`, 'bad');
+        }
+      }
+    }
+
+    function disconnect() {
+      try { state.wallet?.disconnect?.(); } catch {}
+      state.wallet = null;
+      state.pubkey = null;
+      state.accounts = [];
+      $('scan-sec').classList.add('hidden');
+      $('connect-sec').classList.remove('hidden');
+      $('console').classList.add('hidden');
+      $('console').innerHTML = '<span class="line dim">dustpan.sh --execute</span>';
+      $('success').classList.add('hidden');
+      $('sweep-card').classList.add('hidden');
+    }
+
+    function afterConnect() {
+      $('connect-sec').classList.add('hidden');
+      $('scan-sec').classList.remove('hidden');
+      $('wallet-addr').textContent = shorten(state.pubkey.toBase58(), 6, 6);
+      scan();
+    }
+
+    /* ────────── scan + classify ────────── */
+    async function scan() {
+      $('scan-status').textContent = 'SCANNING…';
+      $('dust-empty').innerHTML = '<div><span class="spinner"></span>READING SPL TOKEN ACCOUNTS…</div>';
+      $('sweep-card').classList.add('hidden');
+      $('success').classList.add('hidden');
+      const tbl = $('dust-table');
+      [...tbl.querySelectorAll('.row:not(.header):not(.empty-state)')].forEach(n => n.remove());
+      $('dust-empty').classList.remove('hidden');
+
+      try {
+        const owner = state.pubkey;
+        const [classic, t22] = await Promise.all([
+          state.conn.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_PROGRAM_ID }, 'confirmed'),
+          state.conn.getParsedTokenAccountsByOwner(owner, { programId: TOKEN_2022_PROGRAM_ID }, 'confirmed').catch(() => ({ value: [] })),
+        ]);
+        const merged = [
+          ...classic.value.map(v => ({ ...v, isToken2022: false })),
+          ...t22.value.map(v => ({ ...v, isToken2022: true })),
+        ];
+        log(`found ${merged.length} SPL accounts`, 'ok');
+
+        const accounts = merged
+          .map(({ pubkey, account, isToken2022 }) => {
+            const info = account.data.parsed.info;
+            return {
+              pubkey,
+              mint: info.mint,
+              amount: BigInt(info.tokenAmount.amount),
+              decimals: info.tokenAmount.decimals,
+              isEmpty: info.tokenAmount.amount === '0',
+              isToken2022,
+            };
+          })
+          .filter(a => a.mint !== SOAG_MINT.toBase58());
+
+        state.accounts = accounts;
+        const closeable = accounts.filter(a => a.isEmpty);
+        const heldDust  = accounts.filter(a => !a.isEmpty);
+
+        renderTable(closeable, heldDust);
+        await updateStatsAndQuote(closeable.length);
+        $('scan-status').textContent = `SCAN COMPLETE · ${closeable.length} CLOSEABLE / ${heldDust.length} HELD`;
+      } catch (e) {
+        console.error(e);
+        log(`scan failed: ${e.message || e}`, 'bad');
+        $('scan-status').textContent = 'SCAN FAILED';
+        $('dust-empty').innerHTML = `<div class="bad">SCAN FAILED: ${e.message || e}</div>`;
+      }
+    }
+
+    function renderTable(closeable, held) {
+      const tbl = $('dust-table');
+      $('dust-empty').classList.add('hidden');
+      const rows = [];
+
+      for (const a of closeable.slice(0, 100)) {
+        rows.push({
+          icon: '⊘',
+          sym: 'EMPTY',
+          mint: a.mint,
+          balanceText: '0',
+          usdText: fmtSolShort(RENT_PER_ATA) + ' SOL rent',
+          badge: '<span class="badge close">CLOSE + RECLAIM</span>',
+        });
+      }
+      for (const a of held.slice(0, 50)) {
+        const human = Number(a.amount) / Math.pow(10, a.decimals);
+        rows.push({
+          icon: '◉',
+          sym: shorten(a.mint, 3, 3),
+          mint: a.mint,
+          balanceText: human < 0.01 ? '<0.01' : human.toLocaleString('en-US', { maximumFractionDigits: 2 }),
+          usdText: 'priced phase 2',
+          badge: '<span class="badge skip">HELD · v2</span>',
+        });
+      }
+
+      if (rows.length === 0) {
+        $('dust-empty').innerHTML = '<div>WALLET IS CLEAN. NOTHING TO SWEEP. FLEX.</div>';
+        $('dust-empty').classList.remove('hidden');
+        return;
+      }
+
+      for (const r of rows) {
+        const div = document.createElement('div');
+        div.className = 'row';
+        div.innerHTML = `
+          <div class="token-icon">${r.icon}</div>
+          <div class="token-name">
+            <span class="sym">${r.sym}</span>
+            <a class="mint" href="https://solscan.io/token/${r.mint}" target="_blank" rel="noopener">${shorten(r.mint, 6, 6)}</a>
+          </div>
+          <div class="balance hide-mobile"><div class="raw">${r.balanceText}</div></div>
+          <div class="balance hide-mobile"><div class="usd">${r.usdText}</div></div>
+          <div>${r.badge}</div>
+        `;
+        tbl.appendChild(div);
+      }
+    }
+
+    /* ────────── stats + jupiter pre-quote ────────── */
+    async function updateStatsAndQuote(closeableCount) {
+      const total = state.accounts.length;
+      const sweepCount = Math.min(closeableCount, MAX_CLOSE_PER_SWEEP);
+      const reclaimLamports = sweepCount * RENT_PER_ATA;
+      const feeLamports = Math.floor(reclaimLamports * FEE_BPS / 10000);
+      const swapLamports = reclaimLamports - feeLamports;
+
+      $('stat-count').textContent = total;
+      $('stat-closeable').textContent = closeableCount;
+      $('stat-sol').textContent = sweepCount > 0 ? fmtSolShort(reclaimLamports) : '0';
+      if (closeableCount > MAX_CLOSE_PER_SWEEP) {
+        $('stat-sol-sub').textContent = `${MAX_CLOSE_PER_SWEEP} this sweep · ${closeableCount - MAX_CLOSE_PER_SWEEP} on next`;
+      }
+
+      $('cta-count').textContent = sweepCount;
+      $('cta-sol').textContent   = fmtSolShort(reclaimLamports);
+      $('cta-fee').textContent   = fmtSol(feeLamports);
+      $('cta-swap').textContent  = fmtSolShort(swapLamports);
+
+      if (closeableCount === 0) {
+        $('stat-soag').textContent = '0';
+        $('cta-out').textContent = '0 $SOAG';
+        return;
+      }
+
+      try {
+        const url = `${JUP_QUOTE}?inputMint=${SOL_MINT}&outputMint=${SOAG_MINT.toBase58()}&amount=${swapLamports}&slippageBps=300`;
+        const q = await fetch(url).then(r => r.json());
+        if (q.outAmount) {
+          const soagOut = Number(q.outAmount) / 1e6;
+          $('stat-soag').textContent = fmtNum(soagOut);
+          $('cta-out').textContent = `~${fmtNum(soagOut)} $SOAG`;
+          state.lastQuote = q;
+          $('sweep-card').classList.remove('hidden');
+        } else {
+          throw new Error(q.error || 'no route');
+        }
+      } catch (e) {
+        $('stat-soag').textContent = '—';
+        $('cta-out').textContent = '~? $SOAG';
+        $('sweep-card').classList.remove('hidden');
+        log(`quote failed (you can still sweep — quote refreshed on execute): ${e.message || e}`, 'warn');
+      }
+    }
+
+    /* ────────── execute sweep ────────── */
+    async function sweep() {
+      const allCloseable = state.accounts.filter(a => a.isEmpty);
+      if (allCloseable.length === 0) { log('nothing to close.', 'warn'); return; }
+      const closeable = allCloseable.slice(0, MAX_CLOSE_PER_SWEEP);
+      if (allCloseable.length > MAX_CLOSE_PER_SWEEP) {
+        log(`capped at ${MAX_CLOSE_PER_SWEEP} closes this sweep · ${allCloseable.length - MAX_CLOSE_PER_SWEEP} more on next sweep`, 'warn');
+      }
+
+      const reclaimLamports = closeable.length * RENT_PER_ATA;
+      const feeLamports = Math.floor(reclaimLamports * FEE_BPS / 10000);
+      const swapLamports = reclaimLamports - feeLamports;
+
+      $('sweep-btn').disabled = true;
+      $('sweep-btn').innerHTML = '<span class="spinner"></span>BUILDING TXS…';
+      $('console').classList.remove('hidden');
+      log(`sweeping ${closeable.length} accounts · reclaim ${fmtSolShort(reclaimLamports)} SOL · fee ${fmtSol(feeLamports)} SOL · swap ${fmtSolShort(swapLamports)} SOL → SOAG`, 'ok');
+
+      try {
+        log('building close transactions…');
+        const closeTxs = await buildCloseTxs(closeable, feeLamports);
+
+        log('fetching Jupiter swap route…');
+        const swapTx = await buildSwapTx(swapLamports);
+
+        const all = [...closeTxs, swapTx];
+        log(`signing ${all.length} transaction${all.length > 1 ? 's' : ''}…`);
+        $('sweep-btn').innerHTML = '<span class="spinner"></span>AWAITING SIGNATURE…';
+
+        const signed = await state.wallet.signAllTransactions(all);
+
+        const sigs = [];
+        for (let i = 0; i < signed.length; i++) {
+          const tx = signed[i];
+          const label = i < closeTxs.length ? `close batch ${i + 1}/${closeTxs.length}` : 'jupiter swap';
+          $('sweep-btn').innerHTML = `<span class="spinner"></span>${label.toUpperCase()}…`;
+          log(`sending: ${label}…`);
+          const sig = await state.conn.sendRawTransaction(tx.serialize(), { skipPreflight: false, maxRetries: 3 });
+          sigs.push(sig);
+          log(`tx ${i + 1}: ${sig}`, 'dim');
+          await state.conn.confirmTransaction(sig, 'confirmed');
+          log(`✓ confirmed: ${label}`, 'ok');
+        }
+
+        const out = state.lastQuote ? Number(state.lastQuote.outAmount) / 1e6 : 0;
+        showSuccess(out, sigs);
+        triggerDustFx();
+
+      } catch (e) {
+        console.error(e);
+        log(`sweep failed: ${e.message || e}`, 'bad');
+        $('sweep-btn').disabled = false;
+        $('sweep-btn').innerHTML = '🧹 SWEEP + CLAIM';
+      }
+    }
+
+    async function buildCloseTxs(closeable, feeLamports) {
+      const owner = state.pubkey;
+      const txs = [];
+      const batchCount = Math.ceil(closeable.length / CLOSE_CHUNK);
+      let batchIdx = 0;
+      for (let i = 0; i < closeable.length; i += CLOSE_CHUNK) {
+        batchIdx++;
+        const chunk = closeable.slice(i, i + CLOSE_CHUNK);
+        // memo first → Solscan/Phantom label the action up front
+        const ixs = [memoIx(`soag-dustpan/v1 sweep batch ${batchIdx}/${batchCount}`)];
+        for (const a of chunk) {
+          ixs.push(createCloseAccountInstruction(
+            new PublicKey(a.pubkey.toString()),
+            owner,
+            owner,
+            [],
+            a.isToken2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID
+          ));
+        }
+        const isLast = i + CLOSE_CHUNK >= closeable.length;
+        if (isLast && feeLamports > 0) {
+          ixs.push(SystemProgram.transfer({
+            fromPubkey: owner,
+            toPubkey: TREASURY,
+            lamports: feeLamports,
+          }));
+        }
+        const { blockhash } = await state.conn.getLatestBlockhash('confirmed');
+        const msg = new TransactionMessage({
+          payerKey: owner,
+          recentBlockhash: blockhash,
+          instructions: ixs,
+        }).compileToV0Message();
+        txs.push(new VersionedTransaction(msg));
+      }
+      return txs;
+    }
+
+    async function buildSwapTx(swapLamports) {
+      const qUrl = `${JUP_QUOTE}?inputMint=${SOL_MINT}&outputMint=${SOAG_MINT.toBase58()}&amount=${swapLamports}&slippageBps=500`;
+      const quote = await fetch(qUrl).then(r => r.json());
+      if (!quote || !quote.outAmount) throw new Error(`Jupiter quote: ${quote?.error || 'no route'}`);
+      state.lastQuote = quote;
+
+      const body = {
+        quoteResponse: quote,
+        userPublicKey: state.pubkey.toBase58(),
+        wrapAndUnwrapSol: true,
+        dynamicComputeUnitLimit: true,
+        prioritizationFeeLamports: 'auto',
+      };
+      const res = await fetch(JUP_SWAP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const swap = await res.json();
+      if (!swap.swapTransaction) throw new Error(`Jupiter swap: ${swap?.error || 'no tx'}`);
+      const txBuf = Uint8Array.from(atob(swap.swapTransaction), c => c.charCodeAt(0));
+      return VersionedTransaction.deserialize(txBuf);
+    }
+
+    /* ────────── result ────────── */
+    function showSuccess(soagOut, sigs) {
+      $('sweep-card').classList.add('hidden');
+      $('success').classList.remove('hidden');
+      $('success-amount').textContent = fmtNum(soagOut);
+      $('success-addr').textContent = shorten(state.pubkey.toBase58(), 6, 6);
+      const linksEl = $('success-links');
+      linksEl.innerHTML = sigs.map((s, i) =>
+        `<a href="https://solscan.io/tx/${s}" target="_blank" rel="noopener">TX ${i + 1} · ${shorten(s, 6, 6)}</a>`
+      ).join('');
+      const closeable = state.accounts.filter(a => a.isEmpty);
+      const tweet = encodeURIComponent(
+        `just vacuumed ${closeable.length} dead shitcoins out of my wallet and got ${fmtNum(soagOut)} $SOAG\n\nyour dust → $SOAG → degenerate again\n\nagentsoag.com/dustpan`
+      );
+      $('share-x').href = `https://twitter.com/intent/tweet?text=${tweet}`;
+    }
+
+    function triggerDustFx() {
+      const flash = $('swept-flash');
+      flash.classList.add('on');
+      setTimeout(() => flash.classList.remove('on'), 500);
+
+      const fx = $('dust-fx');
+      const count = 36;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'p';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 100 + Math.random() * 400;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        p.style.left = `${cx}px`;
+        p.style.top  = `${cy}px`;
+        p.style.setProperty('--dx', `${dx}px`);
+        p.style.setProperty('--dy', `${dy}px`);
+        p.style.animationDelay = `${Math.random() * 0.2}s`;
+        fx.appendChild(p);
+        setTimeout(() => p.remove(), 1500);
+      }
+    }
+
+    /* ────────── wire up ────────── */
+    document.querySelectorAll('.wallet-btn').forEach(btn => {
+      btn.addEventListener('click', () => connect(btn.dataset.wallet));
+    });
+    $('disconnect-btn').addEventListener('click', disconnect);
+    $('rescan-btn').addEventListener('click', () => { $('success').classList.add('hidden'); scan(); });
+    $('sweep-btn').addEventListener('click', confirmSweep);
+    $('presign-cancel').addEventListener('click', () => $('presign-modal').classList.remove('on'));
+    $('presign-go').addEventListener('click', () => {
+      $('presign-modal').classList.remove('on');
+      sweep();
+    });
+
+    function confirmSweep() {
+      const allCloseable = state.accounts.filter(a => a.isEmpty);
+      if (allCloseable.length === 0) { log('nothing to close.', 'warn'); return; }
+      const closeable = allCloseable.slice(0, MAX_CLOSE_PER_SWEEP);
+      const reclaimLamports = closeable.length * RENT_PER_ATA;
+      const feeLamports = Math.floor(reclaimLamports * FEE_BPS / 10000);
+      const swapLamports = reclaimLamports - feeLamports;
+      const batchCount = Math.ceil(closeable.length / CLOSE_CHUNK);
+      const totalSigs = batchCount + 1;
+
+      $('presign-count').textContent = totalSigs;
+      const list = $('presign-list');
+      list.innerHTML = '';
+      for (let b = 1; b <= batchCount; b++) {
+        const isLast = b === batchCount;
+        const closesInBatch = isLast ? (closeable.length - (b - 1) * CLOSE_CHUNK) : CLOSE_CHUNK;
+        const li = document.createElement('li');
+        let txt = `Close <b>${closesInBatch}</b> empty token accounts → reclaim <b>${fmtSolShort(closesInBatch * RENT_PER_ATA)}</b> SOL`;
+        if (isLast && feeLamports > 0) {
+          txt += ` + transfer <b>${fmtSol(feeLamports)}</b> SOL (1%) to treasury`;
+        }
+        li.innerHTML = `<span class="ix">TX ${b}</span><div>${txt}</div>`;
+        list.appendChild(li);
+      }
+      const swapLi = document.createElement('li');
+      const soagOut = state.lastQuote ? Number(state.lastQuote.outAmount) / 1e6 : null;
+      const soagText = soagOut ? `~<b>${fmtNum(soagOut)}</b> $SOAG` : '$SOAG via Jupiter';
+      swapLi.innerHTML = `<span class="ix">TX ${totalSigs}</span><div>Jupiter swap <b>${fmtSolShort(swapLamports)}</b> SOL → ${soagText}, deposited to your wallet</div>`;
+      list.appendChild(swapLi);
+
+      $('presign-modal').classList.add('on');
+    }
+    $('sweep-again').addEventListener('click', () => { $('success').classList.add('hidden'); scan(); });
+
+    (async () => {
+      const a = window.phantom?.solana;
+      if (a?.isPhantom) {
+        try {
+          const resp = await a.connect({ onlyIfTrusted: true });
+          state.wallet = a;
+          state.walletName = 'phantom';
+          state.pubkey = new PublicKey(resp.publicKey.toString());
+          afterConnect();
+        } catch {/* user hasn't trusted */}
+      }
+    })();
+  </script>
+
+</body>
+</html>
