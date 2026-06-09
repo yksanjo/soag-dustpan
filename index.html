@@ -989,8 +989,9 @@
     }
 
     /* ────────── config ────────── */
-    const HELIUS_KEY    = '5bb69ab9-3e25-4b80-a043-f1c482490b06';
-    const RPC_URL       = `https://mainnet.helius-rpc.com/?api-key=${HELIUS_KEY}`;
+    // A browser bundle cannot hide an RPC key — never hardcode a private key here.
+    // Default to the keyless public endpoint; to use a keyed RPC, proxy it through your own backend.
+    const RPC_URL       = 'https://api.mainnet-beta.solana.com';
     const SOAG_MINT     = new PublicKey('ADue87cPcDhsyGq2hrDsukp7j8AFTSnaYHSanDATpump');
     const TREASURY      = new PublicKey('J7Vq2JjQoH72n1kzy1yjm4dCG65gw1oSVzMECwRyd7fP');
     const FEE_BPS       = 100;          // 1%
